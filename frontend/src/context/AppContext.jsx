@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect, useCallback, useRef } from '
 
 export const AppContext = createContext();
 
-const API_BASE_URL = 'http://127.0.0.1:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
 
 export const AppProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token') || null);
