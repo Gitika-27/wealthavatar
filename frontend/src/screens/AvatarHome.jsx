@@ -78,7 +78,7 @@ export default function AvatarHome() {
           fontSize: '13px',
           lineHeight: '1.5',
           borderLeft: '3px solid var(--color-gold)',
-          backgroundColor: 'rgba(212, 175, 55, 0.05)',
+          backgroundColor: 'var(--color-gold-glow)',
           position: 'relative'
         }}>
           {avatarMessage}
@@ -90,7 +90,7 @@ export default function AvatarHome() {
         // Not logged in: Show Login Form
         <form onSubmit={handleLogin} className="glass-card" style={{ marginBottom: '10px' }}>
           <h3 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Shield size={18} color="#D4AF37" /> Secure Banking Login
+            <Shield size={18} color="var(--color-gold)" /> Secure Banking Login
           </h3>
 
           {error && (
@@ -156,13 +156,13 @@ export default function AvatarHome() {
               width: '36px',
               height: '36px',
               borderRadius: '50%',
-              backgroundColor: 'rgba(212, 175, 55, 0.15)',
+              backgroundColor: 'var(--color-gold-glow)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0
             }}>
-              <Lightbulb size={20} color="#D4AF37" />
+              <Lightbulb size={20} color="var(--color-gold)" />
             </div>
             <div>
               <h4 style={{ fontSize: '13px', fontWeight: '700', color: 'var(--color-gold)', marginBottom: '4px' }}>

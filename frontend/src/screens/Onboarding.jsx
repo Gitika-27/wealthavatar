@@ -122,7 +122,7 @@ export default function Onboarding() {
 
   if (currentStep === -1) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between', padding: '10px 0' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', justifyContent: 'space-between', padding: '10px 0' }}>
         <div style={{ textAlign: 'center', marginTop: '40px' }}>
           <div className="avatar-container animate-float">
             <div className="avatar-halo">
@@ -168,7 +168,7 @@ export default function Onboarding() {
   // Results Screen
   if (currentStep === RISK_QUESTIONS.length) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between', padding: '20px 0' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', justifyContent: 'space-between', padding: '20px 0' }}>
         <div style={{ textAlign: 'center', marginTop: '60px' }}>
           <div style={{ fontSize: '64px', marginBottom: '20px', animation: 'float 3s ease-in-out infinite' }}>
             🏆
@@ -208,7 +208,7 @@ export default function Onboarding() {
   const progressPct = Math.round(((currentStep) / RISK_QUESTIONS.length) * 100);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between', padding: '10px 0' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', justifyContent: 'space-between', padding: '10px 0' }}>
       <div>
         {/* Progress header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '8px' }}>
@@ -246,7 +246,7 @@ export default function Onboarding() {
                 transition: 'all 0.2s ease'
               }}
               onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-gold)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(212, 175, 55, 0.15)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(0, 148, 94, 0.15)'; }}
             >
               <div style={{
                 width: '24px',

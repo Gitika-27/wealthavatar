@@ -50,30 +50,30 @@ export default function MarketInsights() {
         </h3>
         
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '11px' }}>
-          <div style={{ backgroundColor: 'var(--color-navy-dark)', padding: '10px', borderRadius: '8px' }}>
+          <div style={{ backgroundColor: 'var(--color-navy-light)', padding: '10px', borderRadius: '8px' }}>
             <span style={{ color: 'var(--color-text-muted)' }}>Nifty 50</span>
             <div style={{ fontSize: '13px', color: 'var(--color-success)', fontWeight: '700', marginTop: '2px' }}>
               {data.marketTrends.nifty}
             </div>
           </div>
           
-          <div style={{ backgroundColor: 'var(--color-navy-dark)', padding: '10px', borderRadius: '8px' }}>
+          <div style={{ backgroundColor: 'var(--color-navy-light)', padding: '10px', borderRadius: '8px' }}>
             <span style={{ color: 'var(--color-text-muted)' }}>BSE Sensex</span>
             <div style={{ fontSize: '13px', color: 'var(--color-success)', fontWeight: '700', marginTop: '2px' }}>
               {data.marketTrends.sensex}
             </div>
           </div>
 
-          <div style={{ backgroundColor: 'var(--color-navy-dark)', padding: '10px', borderRadius: '8px' }}>
+          <div style={{ backgroundColor: 'var(--color-navy-light)', padding: '10px', borderRadius: '8px' }}>
             <span style={{ color: 'var(--color-text-muted)' }}>Gold (24K / 10g)</span>
             <div style={{ fontSize: '13px', color: 'var(--color-success)', fontWeight: '700', marginTop: '2px' }}>
               {data.marketTrends.gold10g}
             </div>
           </div>
 
-          <div style={{ backgroundColor: 'var(--color-navy-dark)', padding: '10px', borderRadius: '8px' }}>
+          <div style={{ backgroundColor: 'var(--color-navy-light)', padding: '10px', borderRadius: '8px' }}>
             <span style={{ color: 'var(--color-text-muted)' }}>USD / INR</span>
-            <div style={{ fontSize: '13px', color: 'white', fontWeight: '700', marginTop: '2px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--color-text-primary)', fontWeight: '700', marginTop: '2px' }}>
               {data.marketTrends.inrUsd}
             </div>
           </div>
@@ -94,7 +94,7 @@ export default function MarketInsights() {
               display: 'flex', 
               flexDirection: 'column', 
               gap: '8px',
-              borderLeft: item.relevance.toLowerCase().includes(user?.riskProfile?.toLowerCase()) ? '3px solid var(--color-gold)' : '1px solid rgba(212,175,55,0.15)'
+              borderLeft: item.relevance.toLowerCase().includes(user?.riskProfile?.toLowerCase()) ? '3px solid var(--color-gold)' : '1px solid rgba(0, 148, 94, 0.12)'
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -104,7 +104,7 @@ export default function MarketInsights() {
               <span style={{ fontSize: '9px', color: 'var(--color-text-muted)' }}>{item.date}</span>
             </div>
 
-            <h4 style={{ fontSize: '13px', fontWeight: '700', color: 'white', lineHeight: '1.4' }}>
+            <h4 style={{ fontSize: '13px', fontWeight: '700', color: 'var(--color-text-primary)', lineHeight: '1.4' }}>
               {item.title}
             </h4>
             
@@ -113,7 +113,7 @@ export default function MarketInsights() {
             </p>
 
             <div style={{ 
-              backgroundColor: 'rgba(255,255,255,0.03)', 
+              backgroundColor: 'var(--color-navy-light)', 
               borderRadius: '6px', 
               padding: '6px 10px', 
               fontSize: '10px', 

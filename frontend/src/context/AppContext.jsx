@@ -60,12 +60,16 @@ export const AppProvider = ({ children }) => {
     try {
       const response = await apiFn();
       if (response.status === 401 || response.status === 403) {
-        const errData = await response.json();
-        if (errData.error === 'Session expired') {
-          console.warn('Session expired due to server-side inactivity timeout.');
-          setIsAppLocked(true);
-          setIsBiometricAuthenticated(false);
-          alert('Session Expired: You have been logged out due to 5 minutes of inactivity.');
+        let errData = {};
+        try { errData = await response.json(); } catch (_) {}
+        // Handle both server-side session expiry AND JWT expiry
+        const isExpired =
+          errData.error === 'Session expired' ||
+          errData.error?.toLowerCase().includes('expired') ||
+          errData.error?.toLowerCase().includes('invalid token') ||
+          response.status === 401;
+        if (isExpired) {
+          console.warn('Token expired or invalid — logging out.');
           logout();
           return null;
         }

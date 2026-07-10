@@ -138,7 +138,7 @@ export default function Notifications() {
 
       {/* Nudges List */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', flex: 1, paddingBottom: '10px' }}>
-        <h3 style={{ fontSize: '14px', fontWeight: '700', color: 'white', display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <h3 style={{ fontSize: '14px', fontWeight: '700', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <Bell size={15} color="var(--color-gold)" /> Active Alerts ({nudges.length})
         </h3>
 
@@ -153,7 +153,7 @@ export default function Notifications() {
             gap: '12px'
           }} className="glass-card">
             <span style={{ fontSize: '36px' }}>🎉</span>
-            <h4 style={{ color: 'white', fontSize: '14px', fontWeight: '600' }}>You're All Caught Up</h4>
+            <h4 style={{ color: 'var(--color-text-primary)', fontSize: '14px', fontWeight: '600' }}>You're All Caught Up</h4>
             <p style={{ fontSize: '12px', lineHeight: '1.5' }}>
               Cashius hasn't flagged any budget excesses, anomaly transactions, or rebalance issues today. Excellent work!
             </p>
@@ -178,7 +178,7 @@ export default function Notifications() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     {style.icon}
-                    <span style={{ fontSize: '12px', fontWeight: '700', color: 'white' }}>
+                    <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--color-text-primary)' }}>
                       {nudge.title}
                     </span>
                   </div>

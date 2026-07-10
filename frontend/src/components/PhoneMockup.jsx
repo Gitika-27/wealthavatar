@@ -90,7 +90,7 @@ export default function PhoneMockup({ children }) {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(10, 22, 40, 0.98)',
+          backgroundColor: 'rgba(244, 247, 245, 0.96)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -99,8 +99,8 @@ export default function PhoneMockup({ children }) {
           padding: '24px',
           textAlign: 'center'
         }}>
-          <div className="glass-card" style={{ width: '100%', maxWidth: '320px', padding: '30px 20px' }}>
-            <div className="empty-state-avatar" style={{ fontSize: '48px', color: '#D4AF37', margin: '0 auto 16px auto' }}>
+          <div className="glass-card" style={{ width: '100%', maxWidth: '320px', padding: '30px 20px', backgroundColor: 'var(--color-navy-dark)' }}>
+            <div className="empty-state-avatar" style={{ fontSize: '48px', color: 'var(--color-gold)', margin: '0 auto 16px auto' }}>
               🔒
             </div>
             <h2 style={{ fontSize: '20px', marginBottom: '8px', fontFamily: 'var(--font-title)' }}>
@@ -109,7 +109,7 @@ export default function PhoneMockup({ children }) {
             <p style={{ color: 'var(--color-text-muted)', fontSize: '13px', marginBottom: '24px' }}>
               WealthAvatar contains sensitive financial data. Please authenticate to access your portfolio.
             </p>
-
+ 
             {isBiometricEnrolled ? (
               <div style={{ display: 'flex', flexType: 'column', flexDirection: 'column', alignItems: 'center' }}>
                 <div 
@@ -118,7 +118,7 @@ export default function PhoneMockup({ children }) {
                     width: '90px',
                     height: '90px',
                     borderRadius: '50%',
-                    backgroundColor: bioScanning ? 'rgba(212, 175, 55, 0.2)' : 'var(--color-navy-light)',
+                    backgroundColor: bioScanning ? 'rgba(0, 148, 94, 0.15)' : 'var(--color-navy-light)',
                     border: `2px dashed ${bioScanning ? 'var(--color-success)' : 'var(--color-gold)'}`,
                     display: 'flex',
                     alignItems: 'center',
@@ -129,7 +129,7 @@ export default function PhoneMockup({ children }) {
                     transition: 'all 0.3s ease'
                   }}
                 >
-                  <Fingerprint size={44} color={bioScanning ? '#10B981' : '#D4AF37'} />
+                  <Fingerprint size={44} color={bioScanning ? 'var(--color-success)' : 'var(--color-gold)'} />
                 </div>
                 
                 <span style={{ 

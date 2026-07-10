@@ -153,7 +153,7 @@ export default function GoalPlanner() {
                 <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-text-muted)', fontWeight: '600' }}>
                   {goal.type}
                 </span>
-                <h3 style={{ fontSize: '15px', fontWeight: '700', marginTop: '2px', color: 'white' }}>{goal.name}</h3>
+                <h3 style={{ fontSize: '15px', fontWeight: '700', marginTop: '2px', color: 'var(--color-text-primary)' }}>{goal.name}</h3>
               </div>
               <span style={{ 
                 fontSize: '10px', 
@@ -175,7 +175,7 @@ export default function GoalPlanner() {
                   <path
                     d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                     fill="none"
-                    stroke="var(--color-navy-dark)"
+                    stroke="var(--color-navy-light)"
                     strokeWidth="3"
                   />
                   <path
@@ -186,27 +186,27 @@ export default function GoalPlanner() {
                     strokeDasharray={`${goal.progressPercentage}, 100`}
                   />
                 </svg>
-                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justify: 'center', fontSize: '12px', fontWeight: '700' }}>
+                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '700' }}>
                   {goal.progressPercentage}%
                 </div>
               </div>
 
               <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 12px', fontSize: '11px' }}>
-                <div>
+                 <div>
                   <span style={{ color: 'var(--color-text-muted)' }}>Target:</span>
-                  <div style={{ color: 'white', fontWeight: '700' }}>{renderAmount(goal.targetAmount)}</div>
+                  <div style={{ color: 'var(--color-text-primary)', fontWeight: '700' }}>{renderAmount(goal.targetAmount)}</div>
                 </div>
                 <div>
                   <span style={{ color: 'var(--color-text-muted)' }}>Accumulated:</span>
-                  <div style={{ color: 'white', fontWeight: '700' }}>{renderAmount(goal.currentAmount)}</div>
+                  <div style={{ color: 'var(--color-text-primary)', fontWeight: '700' }}>{renderAmount(goal.currentAmount)}</div>
                 </div>
                 <div>
                   <span style={{ color: 'var(--color-text-muted)' }}>Monthly SIP:</span>
-                  <div style={{ color: 'white', fontWeight: '700' }}>{renderAmount(goal.monthlyContribution)}/m</div>
+                  <div style={{ color: 'var(--color-text-primary)', fontWeight: '700' }}>{renderAmount(goal.monthlyContribution)}/m</div>
                 </div>
                 <div>
                   <span style={{ color: 'var(--color-text-muted)' }}>Target Date:</span>
-                  <div style={{ color: 'white', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '2px' }}>
+                  <div style={{ color: 'var(--color-text-primary)', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '2px' }}>
                     <Calendar size={11} /> {goal.targetDate}
                   </div>
                 </div>
@@ -215,7 +215,7 @@ export default function GoalPlanner() {
 
             {/* Cashius specific goal tip */}
             <div style={{ 
-              backgroundColor: 'var(--color-navy-dark)', 
+              backgroundColor: 'var(--color-navy-light)', 
               borderRadius: '8px', 
               padding: '10px 12px', 
               fontSize: '11px', 
@@ -228,11 +228,11 @@ export default function GoalPlanner() {
               <div>
                 {goal.healthStatus === 'On Track' ? (
                   <span style={{ color: 'var(--color-text-muted)' }}>
-                    **On Schedule:** Your current SIP of {renderAmount(goal.monthlyContribution)} is sufficient. Estimated completion is **{goal.targetDate}**.
+                    <strong>On Schedule:</strong> Your current SIP of {renderAmount(goal.monthlyContribution)} is sufficient. Estimated completion is <strong>{goal.targetDate}</strong>.
                   </span>
                 ) : (
                   <span style={{ color: 'var(--color-warning)' }}>
-                    **Under-funded:** Cashius advises increasing monthly SIP to **{renderAmount(goal.requiredMonthly)}** to offset the milestone lag.
+                    <strong>Under-funded:</strong> Cashius advises increasing monthly SIP to <strong>{renderAmount(goal.requiredMonthly)}</strong> to offset the milestone lag.
                   </span>
                 )}
               </div>
@@ -281,13 +281,13 @@ export default function GoalPlanner() {
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         padding: '12px 14px',
-                        backgroundColor: goalType === g.type ? 'rgba(212, 175, 55, 0.15)' : 'rgba(22, 42, 69, 0.4)',
-                        borderColor: goalType === g.type ? 'var(--color-gold)' : 'rgba(212, 175, 55, 0.15)'
+                        backgroundColor: goalType === g.type ? 'rgba(0, 148, 94, 0.12)' : 'var(--color-navy-light)',
+                        borderColor: goalType === g.type ? 'var(--color-gold)' : 'rgba(0, 148, 94, 0.1)'
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <span style={{ fontSize: '18px' }}>{g.icon}</span>
-                        <span style={{ fontSize: '13px', fontWeight: '600', color: 'white' }}>{g.type}</span>
+                        <span style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text-primary)' }}>{g.type}</span>
                       </div>
                       <span style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>{g.defaultRate}</span>
                     </button>
@@ -399,18 +399,18 @@ export default function GoalPlanner() {
 
                 {/* Savings check block */}
                 <div style={{ 
-                  backgroundColor: 'rgba(212, 175, 55, 0.06)', 
-                  border: '1px solid rgba(212, 175, 55, 0.15)',
+                  backgroundColor: 'var(--color-gold-glow)', 
+                  border: '1px solid rgba(0, 148, 94, 0.15)',
                   padding: '10px', 
                   borderRadius: '8px', 
                   fontSize: '11px',
                   lineHeight: '1.4',
                   marginBottom: '20px'
                 }}>
-                  📈 **Required Contribution:** ₹{calculateRequiredSavings().toLocaleString('en-IN')}/month.
+                  📈 <strong>Required Contribution:</strong> ₹{calculateRequiredSavings().toLocaleString('en-IN')}/month.
                   <br />
                   <br />
-                  💡 **Cashius advises:** "Based on your income, you can comfortably save **₹15,000/month** toward this goal. Set your slider accordingly."
+                  💡 <strong>Cashius advises:</strong> "Based on your income, you can comfortably save <strong>₹15,000/month</strong> toward this goal. Set your slider accordingly."
                 </div>
 
                 <div style={{ display: 'flex', gap: '10px' }}>

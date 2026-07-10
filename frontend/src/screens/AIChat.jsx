@@ -9,6 +9,86 @@ const CHAT_SUGGESTIONS = [
   "Tell me about ELSS tax savings"
 ];
 
+function parseBoldText(text) {
+  if (!text) return "";
+  const parts = text.split('**');
+  if (parts.length === 1) return text;
+  
+  return parts.map((part, idx) => {
+    if (idx % 2 === 1) {
+      return <strong key={idx} style={{ fontWeight: '700', color: 'var(--color-gold)' }}>{part}</strong>;
+    }
+    return part;
+  });
+}
+
+function parseMarkdown(text) {
+  if (!text) return "";
+  
+  const lines = text.split('\n');
+  return lines.map((line, lineIdx) => {
+    let content = line;
+    
+    // 1. Headings
+    if (content.startsWith('### ')) {
+      return (
+        <h4 key={lineIdx} style={{ fontSize: '13px', fontWeight: '700', marginTop: '12px', marginBottom: '6px', color: 'var(--color-text-primary)' }}>
+          {parseBoldText(content.slice(4))}
+        </h4>
+      );
+    }
+    if (content.startsWith('## ')) {
+      return (
+        <h3 key={lineIdx} style={{ fontSize: '14px', fontWeight: '700', marginTop: '14px', marginBottom: '8px', color: 'var(--color-text-primary)' }}>
+          {parseBoldText(content.slice(3))}
+        </h3>
+      );
+    }
+    
+    // 2. List Items
+    let isBullet = false;
+    let indentLevel = 0;
+    
+    const trimmed = content.trimStart();
+    const leadingSpaces = content.length - trimmed.length;
+    indentLevel = Math.floor(leadingSpaces / 2);
+    
+    if (trimmed.startsWith('* ') || trimmed.startsWith('+ ') || trimmed.startsWith('- ')) {
+      isBullet = true;
+      content = trimmed.slice(2);
+    }
+    
+    const parsedLine = parseBoldText(content);
+    
+    if (isBullet) {
+      return (
+        <div 
+          key={lineIdx} 
+          style={{ 
+            display: 'flex', 
+            paddingLeft: `${indentLevel * 12 + 4}px`, 
+            margin: '4px 0',
+            alignItems: 'flex-start' 
+          }}
+        >
+          <span style={{ marginRight: '6px', color: 'var(--color-gold)', fontWeight: 'bold' }}>•</span>
+          <span style={{ flex: 1 }}>{parsedLine}</span>
+        </div>
+      );
+    }
+    
+    if (line.trim() === '') {
+      return <div key={lineIdx} style={{ height: '6px' }} />;
+    }
+    
+    return (
+      <p key={lineIdx} style={{ margin: '3px 0' }}>
+        {parsedLine}
+      </p>
+    );
+  });
+}
+
 export default function AIChat() {
   const { chatHistory, fetchChatHistory, sendChatMessage, user } = useContext(AppContext);
   const [inputText, setInputText] = useState('');
@@ -40,12 +120,12 @@ export default function AIChat() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', paddingBottom: '10px' }}>
       
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.06)', marginTop: '10px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingBottom: '12px', borderBottom: '1px solid var(--color-navy-light)', marginTop: '10px' }}>
         <div className="avatar-portrait" style={{ width: '40px', height: '40px', animation: 'none' }}>
           <span style={{ fontSize: '20px' }}>👩‍💼</span>
         </div>
         <div>
-          <h2 style={{ fontSize: '15px', fontWeight: '700', color: 'white' }}>Advising with Cashius</h2>
+          <h2 style={{ fontSize: '15px', fontWeight: '700', color: 'var(--color-text-primary)' }}>Advising with Cashius</h2>
           <span style={{ fontSize: '10px', color: 'var(--color-success)', fontWeight: '600' }}>● Online Private Advisor</span>
         </div>
       </div>
@@ -66,7 +146,7 @@ export default function AIChat() {
         {chatHistory.length === 0 && (
           <div style={{ textAlign: 'center', margin: '40px 10px', color: 'var(--color-text-muted)' }}>
             <span style={{ fontSize: '36px' }}>💬</span>
-            <h4 style={{ color: 'white', marginTop: '10px', fontSize: '14px' }}>Ask Cashius Anything</h4>
+            <h4 style={{ color: 'var(--color-text-primary)', marginTop: '10px', fontSize: '14px' }}>Ask Cashius Anything</h4>
             <p style={{ fontSize: '12px', marginTop: '6px', lineHeight: '1.5' }}>
               I have access to your spending logs, portfolio holdings, and active goals. Ask me how to optimize your financial strategy!
             </p>
@@ -109,16 +189,16 @@ export default function AIChat() {
                   borderRadius: '12px',
                   borderTopRightRadius: isUser ? '2px' : '12px',
                   borderTopLeftRadius: isUser ? '12px' : '2px',
-                  maxWidth: '80%',
+                  maxWidth: '85%',
                   fontSize: '12.5px',
                   lineHeight: '1.5',
-                  backgroundColor: isUser ? 'rgba(212, 175, 55, 0.1)' : 'var(--color-navy-card)',
-                  borderColor: isUser ? 'rgba(212, 175, 55, 0.3)' : 'rgba(212, 175, 55, 0.15)',
-                  whiteSpace: 'pre-wrap',
-                  textAlign: 'left'
+                  backgroundColor: isUser ? 'rgba(0, 148, 94, 0.08)' : 'var(--color-navy-dark)',
+                  borderColor: isUser ? 'rgba(0, 148, 94, 0.25)' : 'rgba(0, 148, 94, 0.1)',
+                  textAlign: 'left',
+                  color: 'var(--color-text-primary)'
                 }}
               >
-                {msg.message}
+                {parseMarkdown(msg.message)}
               </div>
 
               {isUser && (
@@ -133,8 +213,8 @@ export default function AIChat() {
                   justifyContent: 'center',
                   fontSize: '12px',
                   flexShrink: 0,
-                  color: 'white',
-                  fontWeight: '600'
+                  color: 'var(--color-gold)',
+                  fontWeight: '700'
                 }}>
                   {user?.name ? user.name[0] : 'U'}
                 </div>
@@ -178,15 +258,15 @@ export default function AIChat() {
                 onClick={() => handleSend(s)}
                 className="glass-card"
                 style={{ 
-                  padding: '6px 10px', 
+                  padding: '6px 12px', 
                   fontSize: '11px', 
                   borderRadius: '16px', 
-                  color: 'white',
-                  borderColor: 'rgba(212, 175, 55, 0.2)',
-                  backgroundColor: 'rgba(22, 42, 69, 0.3)'
+                  color: 'var(--color-text-primary)',
+                  borderColor: 'rgba(0, 148, 94, 0.15)',
+                  backgroundColor: 'var(--color-navy-dark)'
                 }}
                 onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--color-gold)'}
-                onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(212, 175, 55, 0.2)'}
+                onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(0, 148, 94, 0.15)'}
               >
                 {s}
               </button>
@@ -220,7 +300,7 @@ export default function AIChat() {
             height: '36px',
             borderRadius: '50%',
             backgroundColor: inputText.trim() && !sending ? 'var(--color-gold)' : 'var(--color-navy-light)',
-            color: inputText.trim() && !sending ? '#0A1628' : 'var(--color-text-muted)',
+            color: inputText.trim() && !sending ? '#FFFFFF' : 'var(--color-text-muted)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

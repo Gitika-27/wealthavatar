@@ -159,7 +159,7 @@ export default function SpendingAnalyzer() {
           {/* Legend Grid */}
           <div style={{ width: '50%', display: 'grid', gridTemplateColumns: '1fr', gap: '6px', fontSize: '11px' }}>
             {donutData.map((entry, idx) => (
-              <div key={idx} style={{ display: 'flex', alignItems: 'center', justify: 'space-between' }}>
+              <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: COLORS[entry.name] }}></span>
                   <span style={{ color: 'var(--color-text-muted)', fontWeight: '500' }}>{entry.name}</span>
@@ -172,9 +172,9 @@ export default function SpendingAnalyzer() {
           </div>
         </div>
 
-        <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.06)', margin: '12px 0' }}></div>
+        <div style={{ width: '100%', height: '1px', backgroundColor: 'var(--color-navy-light)', margin: '12px 0' }}></div>
         
-        <div style={{ display: 'flex', justify: 'space-between', width: '100%', fontSize: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', fontSize: '12px' }}>
           <span style={{ color: 'var(--color-text-muted)' }}>June Total Expenditure:</span>
           <span className="gold-text-gradient" style={{ fontWeight: '700', fontSize: '14px' }}>
             {renderAmount(totalSpent)}
@@ -203,7 +203,7 @@ export default function SpendingAnalyzer() {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '700', marginBottom: '4px' }}>
-                  <span style={{ color: 'white' }}>{anomaly.merchantName}</span>
+                  <span style={{ color: 'var(--color-text-primary)' }}>{anomaly.merchantName}</span>
                   <span style={{ color: 'var(--color-danger)' }}>{renderAmount(anomaly.amount)}</span>
                 </div>
                 <p style={{ color: 'var(--color-text-muted)', lineHeight: '1.4' }}>{anomaly.reason}</p>
@@ -243,7 +243,7 @@ export default function SpendingAnalyzer() {
             
             return (
               <div key={cat}>
-                <div style={{ display: 'flex', justify: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: COLORS[cat] }}></span>
                     <span style={{ fontWeight: '500' }}>{cat}</span>
@@ -281,9 +281,9 @@ export default function SpendingAnalyzer() {
                 <div style={{
                   width: '32px',
                   height: '32px',
-                  borderRadius: '8px',
-                  backgroundColor: COLORS[tx.category] ? `${COLORS[tx.category]}20` : 'rgba(255,255,255,0.08)',
-                  color: COLORS[tx.category] || 'white',
+                  borderRadius: '50%',
+                  backgroundColor: COLORS[tx.category] ? `${COLORS[tx.category]}20` : 'var(--color-navy-light)',
+                  color: COLORS[tx.category] || 'var(--color-text-primary)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -292,7 +292,7 @@ export default function SpendingAnalyzer() {
                   {CATEGORY_ICONS[tx.category] || <HelpCircle size={16} />}
                 </div>
                 <div>
-                  <h4 style={{ fontSize: '12px', fontWeight: '600', color: 'white', maxWidth: '170px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <h4 style={{ fontSize: '12px', fontWeight: '600', color: 'var(--color-text-primary)', maxWidth: '170px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {tx.merchantName}
                   </h4>
                   <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>

@@ -227,7 +227,7 @@ export default function Dashboard() {
                   fontSize: '11px',
                   fontWeight: '700',
                   backgroundColor: timeframe === tf ? 'var(--color-gold)' : 'transparent',
-                  color: timeframe === tf ? '#0A1628' : 'var(--color-text-muted)'
+                  color: timeframe === tf ? '#FFFFFF' : 'var(--color-text-muted)'
                 }}
               >
                 {tf}
@@ -257,11 +257,11 @@ export default function Dashboard() {
               />
               <Tooltip 
                 contentStyle={{ 
-                  backgroundColor: 'var(--color-navy-light)', 
-                  border: '1px solid rgba(212,175,55,0.3)',
+                  backgroundColor: 'var(--color-navy-dark)', 
+                  border: '1px solid rgba(0, 148, 94, 0.3)',
                   borderRadius: '8px',
                   fontSize: '11px',
-                  color: 'white'
+                  color: 'var(--color-text-primary)'
                 }}
                 formatter={(value) => [renderBalance(value), 'Value']}
               />

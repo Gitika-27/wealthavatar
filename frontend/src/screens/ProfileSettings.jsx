@@ -55,7 +55,7 @@ export default function ProfileSettings() {
           👤
         </div>
         <div>
-          <h3 style={{ fontSize: '15px', fontWeight: '700', color: 'white' }}>{user?.name || 'Rajesh Kumar'}</h3>
+          <h3 style={{ fontSize: '15px', fontWeight: '700', color: 'var(--color-text-primary)' }}>{user?.name || 'Rajesh Kumar'}</h3>
           <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>{user?.email || 'rajesh@example.com'}</span>
         </div>
       </div>
@@ -99,17 +99,17 @@ export default function ProfileSettings() {
         </h3>
 
         {/* Hide Balance Toggle */}
-        <div style={{ display: 'flex', justify: 'space-between', alignItems: 'center', paddingBottom: '10px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '10px', borderBottom: '1px solid var(--color-navy-light)' }}>
           <div>
-            <h4 style={{ fontSize: '12px', fontWeight: '600', color: 'white' }}>Mask Balances</h4>
+            <h4 style={{ fontSize: '12px', fontWeight: '600', color: 'var(--color-text-primary)' }}>Mask Balances</h4>
             <p style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Hide numeric values on dashboard cards</p>
           </div>
           
           <button 
             onClick={toggleBalancePrivacy}
             style={{ 
-              backgroundColor: isBalanceHidden ? 'var(--color-gold)' : 'var(--color-navy-dark)', 
-              color: isBalanceHidden ? '#0A1628' : 'var(--color-text-muted)',
+              backgroundColor: isBalanceHidden ? 'var(--color-gold)' : 'var(--color-navy-light)', 
+              color: isBalanceHidden ? '#FFFFFF' : 'var(--color-text-muted)',
               width: '40px',
               height: '24px',
               borderRadius: '12px',
@@ -117,26 +117,26 @@ export default function ProfileSettings() {
               alignItems: 'center',
               justifyContent: isBalanceHidden ? 'flex-end' : 'flex-start',
               padding: '2px',
-              border: '1.5px solid rgba(212,175,55,0.25)',
+              border: '1.5px solid rgba(0, 148, 94, 0.25)',
               transition: 'all 0.25s'
             }}
           >
-            <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: isBalanceHidden ? '#0A1628' : 'var(--color-gold)' }}></div>
+            <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: isBalanceHidden ? '#FFFFFF' : 'var(--color-gold)' }}></div>
           </button>
         </div>
 
         {/* Biometric Enrolled Toggle */}
-        <div style={{ display: 'flex', justify: 'space-between', alignItems: 'center', paddingBottom: '10px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '10px', borderBottom: '1px solid var(--color-navy-light)' }}>
           <div>
-            <h4 style={{ fontSize: '12px', fontWeight: '600', color: 'white' }}>Biometric Login</h4>
+            <h4 style={{ fontSize: '12px', fontWeight: '600', color: 'var(--color-text-primary)' }}>Biometric Login</h4>
             <p style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Enable Fingerprint/FaceID lock simulator</p>
           </div>
           
           <button 
             onClick={toggleBiometricEnrollment}
             style={{ 
-              backgroundColor: isBiometricEnrolled ? 'var(--color-gold)' : 'var(--color-navy-dark)', 
-              color: isBiometricEnrolled ? '#0A1628' : 'var(--color-text-muted)',
+              backgroundColor: isBiometricEnrolled ? 'var(--color-gold)' : 'var(--color-navy-light)', 
+              color: isBiometricEnrolled ? '#FFFFFF' : 'var(--color-text-muted)',
               width: '40px',
               height: '24px',
               borderRadius: '12px',
@@ -144,18 +144,18 @@ export default function ProfileSettings() {
               alignItems: 'center',
               justifyContent: isBiometricEnrolled ? 'flex-end' : 'flex-start',
               padding: '2px',
-              border: '1.5px solid rgba(212,175,55,0.25)',
+              border: '1.5px solid rgba(0, 148, 94, 0.25)',
               transition: 'all 0.25s'
             }}
           >
-            <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: isBiometricEnrolled ? '#0A1628' : 'var(--color-gold)' }}></div>
+            <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: isBiometricEnrolled ? '#FFFFFF' : 'var(--color-gold)' }}></div>
           </button>
         </div>
 
         {/* Session inactivity timeout indicator */}
-        <div style={{ display: 'flex', justify: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h4 style={{ fontSize: '12px', fontWeight: '600', color: 'white' }}>Session Timeout Guard</h4>
+            <h4 style={{ fontSize: '12px', fontWeight: '600', color: 'var(--color-text-primary)' }}>Session Timeout Guard</h4>
             <p style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Autolock active vault after inactivity</p>
           </div>
           <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--color-warning)', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -171,15 +171,15 @@ export default function ProfileSettings() {
         </h3>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '11px', color: 'var(--color-text-muted)' }}>
-          <div style={{ display: 'flex', justify: 'space-between' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>Morning Advisory Tip (Pushes)</span>
             <span style={{ color: 'var(--color-success)', fontWeight: '600' }}>Enabled</span>
           </div>
-          <div style={{ display: 'flex', justify: 'space-between' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>Portfolio Rebalancing Alerts (Emails)</span>
             <span style={{ color: 'var(--color-success)', fontWeight: '600' }}>Enabled</span>
           </div>
-          <div style={{ display: 'flex', justify: 'space-between' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>Anomaly & Budget Warnings (SMS)</span>
             <span style={{ color: 'var(--color-success)', fontWeight: '600' }}>Enabled</span>
           </div>

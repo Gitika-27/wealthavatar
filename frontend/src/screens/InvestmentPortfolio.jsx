@@ -205,7 +205,7 @@ export default function InvestmentPortfolio() {
           {/* Custom legend grid */}
           <div style={{ width: '50%', display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '11px' }}>
             {data.allocation.map((entry, idx) => (
-              <div key={idx} style={{ display: 'flex', alignItems: 'center', justify: 'space-between' }}>
+              <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: COLORS[entry.name] }}></span>
                   <span style={{ color: 'var(--color-text-muted)', fontWeight: '500' }}>{entry.name}</span>
@@ -272,11 +272,11 @@ export default function InvestmentPortfolio() {
                 display: 'flex',
                 justifyContent: 'space-between',
                 paddingBottom: '10px',
-                borderBottom: i < data.holdings.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none'
+                borderBottom: i < data.holdings.length - 1 ? '1px solid var(--color-navy-light)' : 'none'
               }}
             >
               <div>
-                <h4 style={{ fontSize: '12px', fontWeight: '600', color: 'white', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <h4 style={{ fontSize: '12px', fontWeight: '600', color: 'var(--color-text-primary)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {h.assetName}
                 </h4>
                 <div style={{ display: 'flex', gap: '8px', fontSize: '10px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
@@ -292,7 +292,7 @@ export default function InvestmentPortfolio() {
               </div>
               
               <div style={{ textAlign: 'right' }}>
-                <span style={{ fontSize: '12px', fontWeight: '700', color: 'white' }}>
+                <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--color-text-primary)' }}>
                   {renderAmount(h.currentValue)}
                 </span>
                 <div style={{ fontSize: '10px', color: 'var(--color-success)', fontWeight: '600', marginTop: '2px' }}>
@@ -312,14 +312,14 @@ export default function InvestmentPortfolio() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(10, 22, 40, 0.85)',
+          backgroundColor: 'rgba(244, 247, 245, 0.92)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 180,
           padding: '20px'
         }}>
-          <div className="glass-card" style={{ width: '100%', maxWidth: '340px' }}>
+          <div className="glass-card" style={{ width: '100%', maxWidth: '340px', backgroundColor: 'var(--color-navy-dark)' }}>
             <h3 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '14px', fontFamily: 'var(--font-title)' }}>
               Configure Systematic SIP
             </h3>
@@ -327,7 +327,7 @@ export default function InvestmentPortfolio() {
             {sipSuccessMsg ? (
               <div style={{ textAlign: 'center', padding: '20px 0' }}>
                 <CheckCircle size={44} color="var(--color-success)" style={{ margin: '0 auto 12px auto' }} />
-                <p style={{ fontSize: '13px', color: 'white', fontWeight: '600' }}>{sipSuccessMsg}</p>
+                <p style={{ fontSize: '13px', color: 'var(--color-text-primary)', fontWeight: '600' }}>{sipSuccessMsg}</p>
               </div>
             ) : (
               <div>
@@ -374,15 +374,15 @@ export default function InvestmentPortfolio() {
 
                 {/* Cashius recommendation in modal */}
                 <div style={{ 
-                  backgroundColor: 'rgba(212, 175, 55, 0.06)', 
-                  border: '1px solid rgba(212, 175, 55, 0.15)',
+                  backgroundColor: 'var(--color-gold-glow)', 
+                  border: '1px solid rgba(0, 148, 94, 0.15)',
                   padding: '10px',
                   borderRadius: '8px',
                   fontSize: '11px',
                   lineHeight: '1.4',
                   marginBottom: '20px'
                 }}>
-                  💡 **Cashius says:** "Based on your income, a ₹{sipAmount.toLocaleString('en-IN')}/month contribution fits comfortably into your budget, leaving you with healthy liquid cushions."
+                  💡 <strong>Cashius says:</strong> "Based on your income, a ₹{sipAmount.toLocaleString('en-IN')}/month contribution fits comfortably into your budget, leaving you with healthy liquid cushions."
                 </div>
 
                 <div style={{ display: 'flex', gap: '10px' }}>

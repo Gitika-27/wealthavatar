@@ -9,15 +9,15 @@ Personality rules:
 - Use simple, jargon-free language.
 - Always quote figures in Indian Rupees (₹).
 - Proactively highlight risk flags (e.g., spending anomalies, low emergency reserves, off-track goals) and opportunities (e.g., rebalancing, SIP adjustments).
-- Provide structured markdown responses when listing actions.`;
+- Do NOT use markdown formatting characters like double asterisks '**' for bolding, or hash symbols '###' for headers. Write in clean, structured, easy-to-read natural text. Use plain numbers (e.g. 1, 2, 3) or capital letters for sections instead of markdown list bullets. Keep responses highly precise, concise, and easy to understand.`;
 
 /**
  * Call the Claude API with the provided prompt and context
  */
 async function callClaudeAPI(systemPrompt, messages) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey || apiKey === 'your-anthropic-api-key-here') {
-    throw new Error('API key is not configured');
+  if (!apiKey || apiKey === 'your-anthropic-api-key-here' || apiKey === 'your-anthropic-api-key') {
+    throw new Error('Claude API key is not configured');
   }
 
   // Anthropic messages API configuration
@@ -44,6 +44,65 @@ async function callClaudeAPI(systemPrompt, messages) {
 
   const data = await response.json();
   return data.content[0].text;
+}
+
+/**
+ * Call the Groq API with the provided prompt and context
+ */
+async function callGroqAPI(systemPrompt, messages, jsonMode = false) {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey || apiKey === 'your-groq-api-key-here') {
+    throw new Error('Groq API key is not configured');
+  }
+
+  const payload = {
+    model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+    messages: [
+      { role: 'system', content: systemPrompt },
+      ...messages
+    ],
+    temperature: 0.2
+  };
+
+  if (jsonMode) {
+    payload.response_format = { type: 'json_object' };
+  }
+
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Groq API request failed: ${response.status} - ${errorBody}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
+
+/**
+ * Unified AI advisor caller that prefers Groq if configured, and falls back to Claude.
+ */
+async function callAI(systemPrompt, messages, jsonMode = false) {
+  if (process.env.GROQ_API_KEY && process.env.GROQ_API_KEY !== 'your-groq-api-key-here') {
+    try {
+      return await callGroqAPI(systemPrompt, messages, jsonMode);
+    } catch (groqError) {
+      console.warn('Groq API call failed, attempting Claude fallback:', groqError.message);
+      if (process.env.ANTHROPIC_API_KEY && process.env.ANTHROPIC_API_KEY !== 'your-anthropic-api-key-here' && process.env.ANTHROPIC_API_KEY !== 'your-anthropic-api-key') {
+        return await callClaudeAPI(systemPrompt, messages);
+      }
+      throw groqError;
+    }
+  }
+
+  return await callClaudeAPI(systemPrompt, messages);
 }
 
 /**
@@ -88,40 +147,40 @@ function getLocalFallbackAdvice(userContext, customQuery = null) {
     }
     
     if (query.includes('portfolio') || query.includes('investment') || query.includes('asset')) {
-      let advice = `Based on your profile, your asset allocation is **${equityPct}% Equity, ${debtPct}% Debt, ${goldPct}% Gold, and ${cashPct}% Cash**. 
+      let advice = `Based on your profile, your asset allocation is ${equityPct}% Equity, ${debtPct}% Debt, ${goldPct}% Gold, and ${cashPct}% Cash. 
       
-As a user with a **${riskProfile}** risk profile, your optimal split should be around **50% Equity, 35% Debt, 10% Gold, and 5% Cash**.
+As a user with a ${riskProfile} risk profile, your optimal split should be around 50% Equity, 35% Debt, 10% Gold, and 5% Cash.
 
 Here are my recommendations for your portfolio:
-1. **Equity Exposure**: You have ₹${allocation.Equity.toLocaleString('en-IN')} in equities. Consider adding to your current SIPs like a diversified Nifty 50 Index Fund to leverage rupee-cost averaging.
-2. **Rebalancing**: Your Cash allocation is ${cashPct}% (₹${allocation.Cash.toLocaleString('en-IN')}). We should deploy ₹30,000 of your cash into debt instruments or gold bonds to hedge inflation.
-3. **SIP Strategy**: I recommend setting up a Systematic Investment Plan (SIP) in a diversified Nifty 50 Index Fund. Can I help you browse suitable SIP products?`;
+1. Equity Exposure: You have ₹${allocation.Equity.toLocaleString('en-IN')} in equities. Consider adding to your current SIPs like a diversified Nifty 50 Index Fund to leverage rupee-cost averaging.
+2. Rebalancing: Your Cash allocation is ${cashPct}% (₹${allocation.Cash.toLocaleString('en-IN')}). We should deploy ₹30,000 of your cash into debt instruments or gold bonds to hedge inflation.
+3. SIP Strategy: I recommend setting up a Systematic Investment Plan (SIP) in a diversified Nifty 50 Index Fund. Can I help you browse suitable SIP products?`;
       return advice;
     }
 
     if (query.includes('spend') || query.includes('expense') || query.includes('budget') || query.includes('money')) {
-      return `Let's analyze your June spending, ${name}. Your total expenditures this month stand at **₹${monthlyExpenses.toLocaleString('en-IN')}**, which is a **${savingsRate}% savings rate** relative to your income of ₹${monthlyIncome.toLocaleString('en-IN')}.
+      return `Let's analyze your June spending, ${name}. Your total expenditures this month stand at ₹${monthlyExpenses.toLocaleString('en-IN')}, which is a ${savingsRate}% savings rate relative to your income of ₹${monthlyIncome.toLocaleString('en-IN')}.
 
 I detected two areas of interest:
-- **Electricity Bill**: Your bill of ₹8,000 on June 1st is **35% higher** than your historical average of ₹5,900.
-- **Shopping**: You made a high transaction of **₹24,000** at Amazon India. 
+- Electricity Bill: Your bill of ₹8,000 on June 1st is 35% higher than your historical average of ₹5,900.
+- Shopping: You made a high transaction of ₹24,000 at Amazon India. 
 
 To offset this, try keeping your discretionary food delivery limits to ₹5,000 this month. You have currently spent ₹4,400. Let's keep it tight for the remaining weeks!`;
     }
 
     if (query.includes('goal') || query.includes('house') || query.includes('retirement') || query.includes('education')) {
-      const gList = goals.map(g => `- **${g.name}**: Progress is at ${Math.round((g.current_amount/g.target_amount)*100)}% (₹${g.current_amount.toLocaleString('en-IN')} of ₹${g.target_amount.toLocaleString('en-IN')}). Status: **${g.status}**`).join('\n');
+      const gList = goals.map(g => `- ${g.name}: Progress is at ${Math.round((g.current_amount/g.target_amount)*100)}% (₹${g.current_amount.toLocaleString('en-IN')} of ₹${g.target_amount.toLocaleString('en-IN')}). Status: ${g.status}`).join('\n');
       let advice = `Here is your financial goals dashboard:
       
 ${gList}
 
-**Cashius Recommendation:**
-Your goal **"${behindGoals[0] ? behindGoals[0].name : 'Home Purchase'}"** is currently **${behindGoals[0] ? behindGoals[0].status : 'Behind'}**. To meet your target date of 2030, you need to increase your monthly contribution from ₹25,000 to **₹32,500**. I suggest shifting ₹7,500 from your monthly entertainment budget into this goal immediately.`;
+Cashius Recommendation:
+Your goal "${behindGoals[0] ? behindGoals[0].name : 'Home Purchase'}" is currently ${behindGoals[0] ? behindGoals[0].status : 'Behind'}. To meet your target date of 2030, you need to increase your monthly contribution from ₹25,000 to ₹32,500. I suggest shifting ₹7,500 from your monthly entertainment budget into this goal immediately.`;
       return advice;
     }
 
     if (query.includes('risk') || query.includes('profile')) {
-      return `Your risk profile is currently evaluated as **${riskProfile}**, calculated from your onboarding answers and balanced transaction behaviour. This means you can handle moderate volatility in search of long-term capital appreciation. If your investment horizon has changed, you can update this in the Profile Settings screen.`;
+      return `Your risk profile is currently evaluated as ${riskProfile}, calculated from your onboarding answers and balanced transaction behaviour. This means you can handle moderate volatility in search of long-term capital appreciation. If your investment horizon has changed, you can update this in the Profile Settings screen.`;
     }
 
     // Default chat responder
@@ -171,10 +230,10 @@ Customer Profile:
         content: `${contextString}\n\nCustomer Message: ${messageText}`
       });
 
-      const response = await callClaudeAPI(SYSTEM_PROMPT, messages);
+      const response = await callAI(SYSTEM_PROMPT, messages);
       return response;
     } catch (error) {
-      console.warn('AI Advisory (Claude API) call failed, returning smart fallback response:', error.message);
+      console.warn('AI Advisory (Groq/Claude API) call failed, returning smart fallback response:', error.message);
       return getLocalFallbackAdvice(userContext, messageText);
     }
   },
@@ -203,10 +262,10 @@ JSON format:
 }`
       }];
 
-      const rawResponse = await callClaudeAPI(SYSTEM_PROMPT + "\nResponse format MUST be valid JSON only. Do not wrap in markdown code blocks.", messages);
+      const rawResponse = await callAI(SYSTEM_PROMPT + "\nResponse format MUST be valid JSON only. Do not wrap in markdown code blocks.", messages, true);
       return JSON.parse(rawResponse);
     } catch (error) {
-      console.warn('Dashboard AI Insight (Claude API) failed, returning local fallback dashboard advice.');
+      console.warn('Dashboard AI Insight (Groq/Claude API) failed, returning local fallback dashboard advice:', error.message);
       return getLocalFallbackAdvice(userContext);
     }
   }

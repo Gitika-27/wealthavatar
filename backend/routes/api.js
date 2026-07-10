@@ -75,7 +75,7 @@ router.post('/auth/login', async (req, res) => {
     const token = jwt.sign(
       { id: user.id, email: user.email, name: user.name },
       jwtSecret,
-      { expiresIn: '2h' }
+      { expiresIn: '30d' }
     );
 
     // Initialize session active state in cache
