@@ -17,8 +17,8 @@ export const AppProvider = ({ children }) => {
   const [isBalanceHidden, setIsBalanceHidden] = useState(
     localStorage.getItem('isBalanceHidden') === 'true'
   );
-  const [isAppLocked, setIsAppLocked] = useState(!!token); // Lock app if logged in, requiring biometric/pass
-  const [sessionTimeoutDuration, setSessionTimeoutDuration] = useState(300); // 5 minutes in seconds
+  const [isAppLocked, setIsAppLocked] = useState(!!token);
+  const [sessionTimeoutDuration] = useState(300); // 5 minutes in seconds
 
   // Navigation and caches
   const [activeScreen, setActiveScreen] = useState('Onboarding');
@@ -27,6 +27,8 @@ export const AppProvider = ({ children }) => {
   const [portfolioData, setPortfolioData] = useState(null);
   const [goalsData, setGoalsData] = useState([]);
   const [chatHistory, setChatHistory] = useState([]);
+  const [chatSessions, setChatSessions] = useState([]);
+  const [activeSessionId, setActiveSessionId] = useState(null);
   const [marketNews, setMarketNews] = useState(null);
   const [dailyTip, setDailyTip] = useState('');
   const [nudges, setNudges] = useState([]);
@@ -62,7 +64,6 @@ export const AppProvider = ({ children }) => {
       if (response.status === 401 || response.status === 403) {
         let errData = {};
         try { errData = await response.json(); } catch (_) {}
-        // Handle both server-side session expiry AND JWT expiry
         const isExpired =
           errData.error === 'Session expired' ||
           errData.error?.toLowerCase().includes('expired') ||
@@ -100,7 +101,6 @@ export const AppProvider = ({ children }) => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
-      // Force biometric prompt if enrolled
       if (isBiometricEnrolled) {
         setIsAppLocked(true);
         setIsBiometricAuthenticated(false);
@@ -109,9 +109,7 @@ export const AppProvider = ({ children }) => {
         setIsBiometricAuthenticated(true);
       }
 
-      // Route to main flow
       if (data.user.riskProfile === 'Moderate' && !localStorage.getItem('onboarded_completed')) {
-        // If not completed onboarding questionnaire, show Onboarding
         setActiveScreen('Onboarding');
       } else {
         setActiveScreen('Dashboard');
@@ -157,7 +155,6 @@ export const AppProvider = ({ children }) => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
-      // Update local profile risk appetite
       const updatedUser = { ...user, riskProfile: data.riskProfile };
       setUser(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -271,6 +268,27 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  // Delete goal
+  const deleteGoal = async (id) => {
+    try {
+      const res = await handleApiCall(() =>
+        fetch(`${API_BASE_URL}/goals/${id}`, {
+          method: 'DELETE',
+          headers: getHeaders()
+        })
+      );
+      if (res && res.ok) {
+        setGoalsData(prev => prev.filter(g => g.id !== id));
+        await fetchDashboard();
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  };
+
   // Add SIP allocation
   const configureSip = async (amount, assetName) => {
     try {
@@ -326,7 +344,7 @@ export const AppProvider = ({ children }) => {
     }
   }, [token, getHeaders, handleApiCall]);
 
-  // Chat queries history
+  // Chat queries history (legacy — keep for backward compat)
   const fetchChatHistory = useCallback(async () => {
     if (!token) return;
     try {
@@ -342,8 +360,85 @@ export const AppProvider = ({ children }) => {
     }
   }, [token, getHeaders, handleApiCall]);
 
-  // Send message to Cashius
-  const sendChatMessage = async (msg) => {
+  // Fetch all chat sessions for current user
+  const fetchChatSessions = useCallback(async () => {
+    if (!token) return;
+    try {
+      const res = await handleApiCall(() => 
+        fetch(`${API_BASE_URL}/chat/sessions`, { headers: getHeaders() })
+      );
+      if (res && res.ok) {
+        const data = await res.json();
+        setChatSessions(data);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [token, getHeaders, handleApiCall]);
+
+  // Fetch messages of a specific session
+  const fetchSessionMessages = useCallback(async (sessionId) => {
+    if (!token || !sessionId) return;
+    if (sessionId === 'new') {
+      setChatHistory([]);
+      return;
+    }
+    try {
+      const res = await handleApiCall(() => 
+        fetch(`${API_BASE_URL}/chat/sessions/${sessionId}/messages`, { headers: getHeaders() })
+      );
+      if (res && res.ok) {
+        const data = await res.json();
+        setChatHistory(data);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [token, getHeaders, handleApiCall]);
+
+  // Create new empty chat session
+  const createChatSession = async () => {
+    try {
+      const res = await handleApiCall(() => 
+        fetch(`${API_BASE_URL}/chat/sessions`, {
+          method: 'POST',
+          headers: getHeaders()
+        })
+      );
+      if (res && res.ok) {
+        const data = await res.json();
+        await fetchChatSessions();
+        return data.id;
+      }
+      return null;
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  };
+
+  // Delete a chat session
+  const deleteChatSession = async (sessionId) => {
+    try {
+      const res = await handleApiCall(() => 
+        fetch(`${API_BASE_URL}/chat/sessions/${sessionId}`, {
+          method: 'DELETE',
+          headers: getHeaders()
+        })
+      );
+      if (res && res.ok) {
+        await fetchChatSessions();
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  };
+
+  // Send message to Cashius in a session
+  const sendChatMessage = async (msg, sessionId) => {
     const userMsg = { sender: 'user', message: msg, createdAt: new Date().toISOString() };
     setChatHistory(prev => [...prev, userMsg]);
     
@@ -352,7 +447,7 @@ export const AppProvider = ({ children }) => {
         fetch(`${API_BASE_URL}/chat`, {
           method: 'POST',
           headers: getHeaders(),
-          body: JSON.stringify({ message: msg })
+          body: JSON.stringify({ message: msg, sessionId })
         })
       );
       
@@ -360,6 +455,8 @@ export const AppProvider = ({ children }) => {
         const data = await res.json();
         const advisorMsg = { sender: 'advisor', message: data.response, createdAt: new Date().toISOString() };
         setChatHistory(prev => [...prev, advisorMsg]);
+        // Reload sessions to refresh auto-generated titles
+        await fetchChatSessions();
         return true;
       }
       return false;
@@ -397,7 +494,7 @@ export const AppProvider = ({ children }) => {
     inactivityTimerRef.current = setTimeout(() => {
       console.log('Inactivity timeout triggered after 5 minutes.');
       setIsBiometricAuthenticated(false);
-      setIsAppLocked(true); // Lock screen and show biometric lock
+      setIsAppLocked(true);
     }, sessionTimeoutDuration * 1000);
   }, [isAuthenticated, sessionTimeoutDuration]);
 
@@ -447,6 +544,10 @@ export const AppProvider = ({ children }) => {
       portfolioData,
       goalsData,
       chatHistory,
+      setChatHistory,
+      chatSessions,
+      activeSessionId,
+      setActiveSessionId,
       marketNews,
       dailyTip,
       nudges,
@@ -465,11 +566,16 @@ export const AppProvider = ({ children }) => {
       fetchPortfolio,
       fetchGoals,
       addGoal,
+      deleteGoal,
       configureSip,
       fetchNudges,
       fetchMarketNews,
       fetchChatHistory,
       sendChatMessage,
+      fetchChatSessions,
+      fetchSessionMessages,
+      createChatSession,
+      deleteChatSession,
       toggleBalancePrivacy,
       toggleBiometricEnrollment,
       resetInactivityTimer

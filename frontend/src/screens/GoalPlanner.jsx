@@ -9,7 +9,8 @@ import {
   PlusCircle, 
   ArrowRight, 
   CheckCircle,
-  HelpCircle
+  HelpCircle,
+  Trash2
 } from 'lucide-react';
 
 const GOAL_TYPES = [
@@ -21,9 +22,12 @@ const GOAL_TYPES = [
 ];
 
 export default function GoalPlanner() {
-  const { goalsData, fetchGoals, addGoal, loading, isBalanceHidden, user } = useContext(AppContext);
+  const { goalsData, fetchGoals, addGoal, deleteGoal, loading, isBalanceHidden, user } = useContext(AppContext);
   const [showAddModal, setShowAddModal] = useState(false);
   const [wizardStep, setWizardStep] = useState(1);
+  const [goalToDelete, setGoalToDelete] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   // Wizard form state
   const [goalType, setGoalType] = useState('Home Purchase');
@@ -155,17 +159,42 @@ export default function GoalPlanner() {
                 </span>
                 <h3 style={{ fontSize: '15px', fontWeight: '700', marginTop: '2px', color: 'var(--color-text-primary)' }}>{goal.name}</h3>
               </div>
-              <span style={{ 
-                fontSize: '10px', 
-                fontWeight: '700', 
-                color: getStatusColor(goal.healthStatus), 
-                backgroundColor: `${getStatusColor(goal.healthStatus)}15`,
-                padding: '4px 8px',
-                borderRadius: '12px',
-                border: `1px solid ${getStatusColor(goal.healthStatus)}25`
-              }}>
-                {goal.healthStatus}
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ 
+                  fontSize: '10px', 
+                  fontWeight: '700', 
+                  color: getStatusColor(goal.healthStatus), 
+                  backgroundColor: `${getStatusColor(goal.healthStatus)}15`,
+                  padding: '4px 8px',
+                  borderRadius: '12px',
+                  border: `1px solid ${getStatusColor(goal.healthStatus)}25`
+                }}>
+                  {goal.healthStatus}
+                </span>
+                <button
+                  onClick={() => {
+                    setGoalToDelete(goal);
+                    setShowDeleteConfirm(true);
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--color-text-muted)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '4px',
+                    borderRadius: '4px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.color = 'var(--color-danger)'}
+                  onMouseLeave={e => e.currentTarget.style.color = 'var(--color-text-muted)'}
+                  title="Delete Goal"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
             </div>
 
             {/* Circular progress container */}
@@ -429,6 +458,63 @@ export default function GoalPlanner() {
               </div>
             )}
 
+        </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && goalToDelete && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(10, 22, 40, 0.85)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 190,
+          padding: '20px'
+        }}>
+          <div className="glass-card" style={{ width: '100%', maxWidth: '340px', padding: '24px', backgroundColor: 'var(--color-navy-dark)' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '12px', fontFamily: 'var(--font-title)' }}>
+              Delete Goal
+            </h3>
+            <p style={{ fontSize: '13px', color: 'var(--color-text-muted)', marginBottom: '20px', lineHeight: '1.5' }}>
+              Delete this goal? "{goalToDelete.name}" will be permanently removed.
+            </p>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+              <button 
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setGoalToDelete(null);
+                }} 
+                className="btn-secondary" 
+                style={{ width: 'auto', padding: '8px 16px', fontSize: '12px', borderRadius: '8px' }}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={async () => {
+                  setIsDeleting(true);
+                  const success = await deleteGoal(goalToDelete.id);
+                  setIsDeleting(false);
+                  if (success) {
+                    setShowDeleteConfirm(false);
+                    setGoalToDelete(null);
+                  } else {
+                    alert('Failed to delete goal.');
+                  }
+                }} 
+                className="btn-primary" 
+                style={{ width: 'auto', padding: '8px 16px', fontSize: '12px', borderRadius: '8px', backgroundColor: 'var(--color-danger)', borderColor: 'var(--color-danger)' }}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
           </div>
         </div>
       )}

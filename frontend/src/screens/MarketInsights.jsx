@@ -44,7 +44,7 @@ export default function MarketInsights() {
       </div>
 
       {/* Index Ticker Grid */}
-      <div className="glass-card" style={{ padding: '14px' }}>
+      <div className="glass-card" style={{ padding: '24px' }}>
         <h3 style={{ fontSize: '13px', fontWeight: '700', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <BarChart2 size={16} color="var(--color-gold)" /> Live Indian Market Rates
         </h3>

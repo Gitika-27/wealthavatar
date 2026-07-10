@@ -106,7 +106,7 @@ export default function InvestmentPortfolio() {
       </div>
 
       {/* Portfolio Value Summary Card */}
-      <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', padding: '20px 16px' }}>
+      <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', padding: '24px' }}>
         <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--color-text-muted)', fontWeight: '600' }}>
           Total Portfolio Value
         </span>
@@ -137,7 +137,7 @@ export default function InvestmentPortfolio() {
       </div>
 
       {/* Risk Profile Meter */}
-      <div className="glass-card" style={{ padding: '16px' }}>
+      <div className="glass-card" style={{ padding: '24px' }}>
         <h3 style={{ fontSize: '13px', fontWeight: '700', marginBottom: '12px' }}>Risk Spectrum Alignment</h3>
         
         {/* Meter Line */}
@@ -177,19 +177,27 @@ export default function InvestmentPortfolio() {
       </div>
 
       {/* Recharts Allocation Donut */}
-      <div className="glass-card" style={{ padding: '16px' }}>
-        <h3 style={{ fontSize: '14px', fontWeight: '700', marginBottom: '10px' }}>Asset Allocation</h3>
+      <div className="glass-card" style={{ padding: '24px' }}>
+        <h3 style={{ fontSize: '14px', fontWeight: '700', marginBottom: '16px' }}>Asset Allocation</h3>
         
-        <div style={{ display: 'flex', width: '100%', alignItems: 'center', height: '130px' }}>
-          <div style={{ width: '50%', height: '100%' }}>
+        <div style={{ 
+          display: 'flex', 
+          width: '100%', 
+          maxWidth: '520px', 
+          margin: '0 auto', 
+          alignItems: 'center', 
+          height: '140px',
+          gap: '24px'
+        }}>
+          <div style={{ width: '140px', height: '100%', flexShrink: 0 }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={data.allocation}
                   cx="50%"
                   cy="50%"
-                  innerRadius={30}
-                  outerRadius={48}
+                  innerRadius={32}
+                  outerRadius={50}
                   paddingAngle={3}
                   dataKey="value"
                 >
@@ -203,14 +211,14 @@ export default function InvestmentPortfolio() {
           </div>
           
           {/* Custom legend grid */}
-          <div style={{ width: '50%', display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '11px' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '11px' }}>
             {data.allocation.map((entry, idx) => (
               <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: COLORS[entry.name] }}></span>
                   <span style={{ color: 'var(--color-text-muted)', fontWeight: '500' }}>{entry.name}</span>
                 </div>
-                <span style={{ fontWeight: '700' }}>
+                <span style={{ fontWeight: '700', color: 'var(--color-text-primary)' }}>
                   {entry.percentage}% ({renderAmount(entry.value)})
                 </span>
               </div>
@@ -221,7 +229,7 @@ export default function InvestmentPortfolio() {
 
       {/* AI Recommendations Panel */}
       {data.recommendations.length > 0 && (
-        <div className="glass-card" style={{ borderLeft: '4px solid var(--color-gold)', backgroundColor: 'rgba(212, 175, 55, 0.03)', padding: '16px' }}>
+        <div className="glass-card" style={{ borderLeft: '4px solid var(--color-gold)', backgroundColor: 'rgba(212, 175, 55, 0.03)', padding: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
             <Sparkles size={16} color="var(--color-gold)" />
             <h4 style={{ fontSize: '13px', fontWeight: '700', color: 'var(--color-gold)' }}>Cashius Rebalance Advice</h4>
@@ -252,53 +260,75 @@ export default function InvestmentPortfolio() {
       )}
 
       {/* Holdings List table */}
-      <div className="glass-card" style={{ padding: '16px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+      <div className="glass-card" style={{ padding: '24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <h3 style={{ fontSize: '14px', fontWeight: '700' }}>Holdings</h3>
           <button 
             onClick={() => setShowSipModal(true)}
             className="btn-primary" 
-            style={{ width: 'auto', padding: '6px 12px', fontSize: '11px', textTransform: 'none', borderRadius: '6px' }}
+            style={{ width: 'auto', padding: '8px 14px', fontSize: '12px', textTransform: 'none', borderRadius: '20px' }}
           >
             + Start SIP
           </button>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {/* Table Header */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: '2fr 1fr 1.2fr 1fr', 
+          gap: '12px', 
+          paddingBottom: '8px', 
+          borderBottom: '1.5px solid var(--color-navy-light)', 
+          fontSize: '11px', 
+          fontWeight: '700', 
+          color: 'var(--color-text-muted)'
+        }}>
+          <span>Asset / Class</span>
+          <span style={{ textAlign: 'right' }}>Units</span>
+          <span style={{ textAlign: 'right' }}>Current Value</span>
+          <span style={{ textAlign: 'right' }}>Returns</span>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
           {data.holdings.map((h, i) => (
             <div 
               key={h.id || i}
               style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                paddingBottom: '10px',
+                display: 'grid',
+                gridTemplateColumns: '2fr 1fr 1.2fr 1fr',
+                gap: '12px',
+                alignItems: 'center',
+                padding: '12px 0',
                 borderBottom: i < data.holdings.length - 1 ? '1px solid var(--color-navy-light)' : 'none'
               }}
             >
-              <div>
-                <h4 style={{ fontSize: '12px', fontWeight: '600', color: 'var(--color-text-primary)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div style={{ minWidth: 0 }}>
+                <h4 style={{ fontSize: '12px', fontWeight: '600', color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
                   {h.assetName}
                 </h4>
-                <div style={{ display: 'flex', gap: '8px', fontSize: '10px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-                  <span style={{
-                    color: COLORS[h.assetClass] || 'white',
-                    fontWeight: '700'
-                  }}>
-                    {h.assetClass}
-                  </span>
-                  <span>•</span>
-                  <span>Units: {h.units}</span>
-                </div>
+                <span style={{
+                  fontSize: '9px',
+                  color: COLORS[h.assetClass] || 'white',
+                  fontWeight: '700',
+                  textTransform: 'uppercase',
+                  marginTop: '2px',
+                  display: 'inline-block'
+                }}>
+                  {h.assetClass}
+                </span>
               </div>
               
-              <div style={{ textAlign: 'right' }}>
-                <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--color-text-primary)' }}>
-                  {renderAmount(h.currentValue)}
-                </span>
-                <div style={{ fontSize: '10px', color: 'var(--color-success)', fontWeight: '600', marginTop: '2px' }}>
-                  +12.8% Returns
-                </div>
-              </div>
+              <span style={{ fontSize: '12px', color: 'var(--color-text-primary)', textAlign: 'right' }}>
+                {h.units}
+              </span>
+              
+              <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--color-text-primary)', textAlign: 'right' }}>
+                {renderAmount(h.currentValue)}
+              </span>
+              
+              <span style={{ fontSize: '12px', color: 'var(--color-success)', fontWeight: '600', textAlign: 'right' }}>
+                +12.8%
+              </span>
             </div>
           ))}
         </div>

@@ -466,14 +466,27 @@ router.get('/chat/history', authenticateToken, async (req, res) => {
  * Post a prompt query to Cashius
  */
 router.post('/chat', authenticateToken, async (req, res) => {
-  const { message } = req.body;
+  const { message, sessionId } = req.body;
   if (!message) {
     return res.status(400).json({ error: 'Message body cannot be empty.' });
+  }
+  if (!sessionId) {
+    return res.status(400).json({ error: 'sessionId is required.' });
   }
 
   const userId = req.user.id;
 
   try {
+    // Validate ownership of session
+    const sessionCheck = await db.query(
+      'SELECT id, title FROM chat_sessions WHERE id = ? AND user_id = ?',
+      [sessionId, userId]
+    );
+    if (sessionCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Chat session not found or unauthorized.' });
+    }
+    const session = sessionCheck.rows[0];
+
     // 1. Get user context
     const userRes = await db.query('SELECT name, email, risk_profile, monthly_income FROM users WHERE id = ?', [userId]);
     const user = userRes.rows[0];
@@ -492,20 +505,41 @@ router.post('/chat', authenticateToken, async (req, res) => {
       goals: goalsRes.rows
     };
 
-    // 2. Fetch history
+    // 2. Fetch history *for this session* (limit 10)
     const historyRes = await db.query(
-      'SELECT sender, message FROM conversations WHERE user_id = ? ORDER BY created_at ASC LIMIT 10',
-      [userId]
+      'SELECT sender, message FROM conversations WHERE session_id = ? ORDER BY created_at ASC LIMIT 10',
+      [sessionId]
     );
 
-    // Save user message to database
-    await db.execute('INSERT INTO conversations (user_id, sender, message) VALUES (?, ?, ?)', [userId, 'user', message]);
+    // Save user message to database under session_id
+    await db.execute(
+      'INSERT INTO conversations (user_id, session_id, sender, message) VALUES (?, ?, ?, ?)',
+      [userId, sessionId, 'user', message]
+    );
 
     // 3. Query Cashius
     const answer = await askCashius(userContext, historyRes.rows, message);
 
-    // Save advisor response to database
-    await db.execute('INSERT INTO conversations (user_id, sender, message) VALUES (?, ?, ?)', [userId, 'advisor', answer]);
+    // Save advisor response to database under session_id
+    await db.execute(
+      'INSERT INTO conversations (user_id, session_id, sender, message) VALUES (?, ?, ?, ?)',
+      [userId, sessionId, 'advisor', answer]
+    );
+
+    // Update updated_at of the session
+    await db.execute(
+      'UPDATE chat_sessions SET updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [sessionId]
+    );
+
+    // Auto-generate title if default
+    if (session.title === 'New Chat') {
+      const newTitle = message.substring(0, 40) + (message.length > 40 ? '...' : '');
+      await db.execute(
+        'UPDATE chat_sessions SET title = ? WHERE id = ?',
+        [newTitle, sessionId]
+      );
+    }
 
     res.json({ response: answer });
   } catch (error) {
@@ -601,6 +635,121 @@ router.get('/market/news', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('News Endpoint Error:', error.message);
     res.status(500).json({ error: 'Failed to load market news.' });
+  }
+});
+
+// -------------------------------------------------------------------------
+// ADDED ENDPOINTS FOR GOAL DELETION AND CHAT SESSIONS
+// -------------------------------------------------------------------------
+
+/**
+ * Delete a financial goal
+ */
+router.delete('/goals/:id', authenticateToken, async (req, res) => {
+  const goalId = req.params.id;
+  try {
+    const checkRes = await db.query('SELECT id FROM goals WHERE id = ? AND user_id = ?', [goalId, req.user.id]);
+    if (checkRes.rows.length === 0) {
+      return res.status(404).json({ error: 'Goal not found or unauthorized.' });
+    }
+    await db.execute('DELETE FROM goals WHERE id = ? AND user_id = ?', [goalId, req.user.id]);
+    res.json({ message: 'Goal deleted successfully.' });
+  } catch (error) {
+    console.error('Goal Delete Error:', error.message);
+    res.status(500).json({ error: 'Failed to delete goal.' });
+  }
+});
+
+/**
+ * Create a new empty chat session
+ */
+router.post('/chat/sessions', authenticateToken, async (req, res) => {
+  try {
+    let newId;
+    if (db.isSQLite()) {
+      const result = await db.execute(
+        'INSERT INTO chat_sessions (user_id, title) VALUES (?, ?)',
+        [req.user.id, 'New Chat']
+      );
+      newId = result.lastID;
+    } else {
+      const result = await db.query(
+        'INSERT INTO chat_sessions (user_id, title) VALUES (?, ?) RETURNING id',
+        [req.user.id, 'New Chat']
+      );
+      newId = result.rows[0].id;
+    }
+    res.status(201).json({ id: newId, message: 'Chat session created.' });
+  } catch (error) {
+    console.error('Create Session Error:', error.message);
+    res.status(500).json({ error: 'Failed to create chat session.' });
+  }
+});
+
+/**
+ * List all sessions for the user, most recent first
+ */
+router.get('/chat/sessions', authenticateToken, async (req, res) => {
+  try {
+    const sessionsRes = await db.query(
+      'SELECT id, title, created_at as createdAt, updated_at as updatedAt FROM chat_sessions WHERE user_id = ? ORDER BY updated_at DESC, id DESC',
+      [req.user.id]
+    );
+    res.json(sessionsRes.rows);
+  } catch (error) {
+    console.error('Get Sessions Error:', error.message);
+    res.status(500).json({ error: 'Failed to retrieve chat sessions.' });
+  }
+});
+
+/**
+ * Get all messages for a session
+ */
+router.get('/chat/sessions/:sessionId/messages', authenticateToken, async (req, res) => {
+  const { sessionId } = req.params;
+  try {
+    const sessionCheck = await db.query(
+      'SELECT id FROM chat_sessions WHERE id = ? AND user_id = ?',
+      [sessionId, req.user.id]
+    );
+    if (sessionCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Chat session not found or unauthorized.' });
+    }
+
+    const messagesRes = await db.query(
+      'SELECT sender, message, created_at as createdAt FROM conversations WHERE session_id = ? ORDER BY created_at ASC',
+      [sessionId]
+    );
+    res.json(messagesRes.rows);
+  } catch (error) {
+    console.error('Get Session Messages Error:', error.message);
+    res.status(500).json({ error: 'Failed to retrieve messages.' });
+  }
+});
+
+/**
+ * Delete a session and its messages (cascade)
+ */
+router.delete('/chat/sessions/:sessionId', authenticateToken, async (req, res) => {
+  const { sessionId } = req.params;
+  try {
+    const sessionCheck = await db.query(
+      'SELECT id FROM chat_sessions WHERE id = ? AND user_id = ?',
+      [sessionId, req.user.id]
+    );
+    if (sessionCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Chat session not found or unauthorized.' });
+    }
+
+    // Delete messages manually to be safe (cascade fallback)
+    await db.execute('DELETE FROM conversations WHERE session_id = ?', [sessionId]);
+    // Delete session
+    await db.execute('DELETE FROM chat_sessions WHERE id = ? AND user_id = ?', [sessionId, req.user.id]);
+
+    res.json({ message: 'Chat session deleted successfully.' });
+  } catch (error) {
+    console.error('Delete Session Error:', error.message);
+    res.status(500).json({ error: 'Failed to delete chat session.' });
   }
 });
 

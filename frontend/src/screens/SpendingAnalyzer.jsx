@@ -131,19 +131,27 @@ export default function SpendingAnalyzer() {
       </div>
 
       {/* Recharts Donut Pie Chart */}
-      <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px' }}>
-        <h3 style={{ fontSize: '14px', fontWeight: '700', alignSelf: 'flex-start', marginBottom: '10px' }}>Category Breakdown</h3>
+      <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '24px' }}>
+        <h3 style={{ fontSize: '14px', fontWeight: '700', alignSelf: 'flex-start', marginBottom: '16px' }}>Category Breakdown</h3>
         
-        <div style={{ display: 'flex', width: '100%', alignItems: 'center', height: '140px' }}>
-          <div style={{ width: '50%', height: '100%' }}>
+        <div style={{ 
+          display: 'flex', 
+          width: '100%', 
+          maxWidth: '520px', 
+          margin: '0 auto', 
+          alignItems: 'center', 
+          height: '140px',
+          gap: '24px'
+        }}>
+          <div style={{ width: '140px', height: '100%', flexShrink: 0 }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={donutData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={36}
-                  outerRadius={54}
+                  innerRadius={34}
+                  outerRadius={52}
                   paddingAngle={3}
                   dataKey="value"
                 >
@@ -157,15 +165,15 @@ export default function SpendingAnalyzer() {
           </div>
           
           {/* Legend Grid */}
-          <div style={{ width: '50%', display: 'grid', gridTemplateColumns: '1fr', gap: '6px', fontSize: '11px' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '11px' }}>
             {donutData.map((entry, idx) => (
               <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: COLORS[entry.name] }}></span>
                   <span style={{ color: 'var(--color-text-muted)', fontWeight: '500' }}>{entry.name}</span>
                 </div>
-                <span style={{ fontWeight: '700' }}>
-                  {Math.round((entry.value / totalSpent) * 100)}%
+                <span style={{ fontWeight: '700', color: 'var(--color-text-primary)' }}>
+                  {renderAmount(entry.value)} ({entry.percentage}%)
                 </span>
               </div>
             ))}
@@ -184,7 +192,7 @@ export default function SpendingAnalyzer() {
 
       {/* Anomaly Alerts Panel */}
       {data.anomalies.length > 0 && (
-        <div className="glass-card" style={{ border: '1px solid rgba(239, 68, 68, 0.4)', backgroundColor: 'rgba(239, 68, 68, 0.03)', padding: '16px' }}>
+        <div className="glass-card" style={{ border: '1px solid rgba(239, 68, 68, 0.4)', backgroundColor: 'rgba(239, 68, 68, 0.03)', padding: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
             <AlertTriangle size={18} color="var(--color-danger)" />
             <h3 style={{ fontSize: '14px', fontWeight: '700', color: 'var(--color-danger)' }}>Anomalies Flagged by Cashius</h3>
@@ -214,7 +222,7 @@ export default function SpendingAnalyzer() {
       )}
 
       {/* Monthly Expenses Chart */}
-      <div className="glass-card" style={{ padding: '16px' }}>
+      <div className="glass-card" style={{ padding: '24px' }}>
         <h3 style={{ fontSize: '14px', fontWeight: '700', marginBottom: '12px' }}>Monthly Comparison (6 Months)</h3>
         
         <div style={{ width: '100%', height: '140px' }}>
@@ -233,7 +241,7 @@ export default function SpendingAnalyzer() {
       </div>
 
       {/* Budget vs Actual Comparison list */}
-      <div className="glass-card" style={{ padding: '16px' }}>
+      <div className="glass-card" style={{ padding: '24px' }}>
         <h3 style={{ fontSize: '14px', fontWeight: '700', marginBottom: '14px' }}>Budget Tracking</h3>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -262,25 +270,43 @@ export default function SpendingAnalyzer() {
       </div>
 
       {/* Detailed Transaction List */}
-      <div className="glass-card" style={{ padding: '16px' }}>
-        <h3 style={{ fontSize: '14px', fontWeight: '700', marginBottom: '14px' }}>June Transaction Ledger</h3>
+      <div className="glass-card" style={{ padding: '24px' }}>
+        <h3 style={{ fontSize: '14px', fontWeight: '700', marginBottom: '16px' }}>June Transaction Ledger</h3>
         
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {/* Table Header */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: '2fr 1fr 1.2fr', 
+          gap: '12px', 
+          paddingBottom: '8px', 
+          borderBottom: '1.5px solid var(--color-navy-light)', 
+          fontSize: '11px', 
+          fontWeight: '700', 
+          color: 'var(--color-text-muted)',
+          marginBottom: '10px'
+        }}>
+          <span>Merchant / Date</span>
+          <span style={{ textAlign: 'center' }}>Category</span>
+          <span style={{ textAlign: 'right' }}>Amount</span>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
           {data.transactions.map((tx, idx) => (
             <div 
-              key={tx.id || idx} 
-              style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'space-between',
-                paddingBottom: '10px',
+              key={tx.id || idx}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '2fr 1fr 1.2fr',
+                gap: '12px',
+                alignItems: 'center',
+                padding: '12px 0',
                 borderBottom: idx < data.transactions.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
                 <div style={{
-                  width: '32px',
-                  height: '32px',
+                  width: '28px',
+                  height: '28px',
                   borderRadius: '50%',
                   backgroundColor: COLORS[tx.category] ? `${COLORS[tx.category]}20` : 'var(--color-navy-light)',
                   color: COLORS[tx.category] || 'var(--color-text-primary)',
@@ -289,22 +315,40 @@ export default function SpendingAnalyzer() {
                   justifyContent: 'center',
                   flexShrink: 0
                 }}>
-                  {CATEGORY_ICONS[tx.category] || <HelpCircle size={16} />}
+                  {CATEGORY_ICONS[tx.category] || <HelpCircle size={14} />}
                 </div>
-                <div>
-                  <h4 style={{ fontSize: '12px', fontWeight: '600', color: 'var(--color-text-primary)', maxWidth: '170px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <div style={{ minWidth: 0 }}>
+                  <h4 style={{ fontSize: '12px', fontWeight: '600', color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
                     {tx.merchantName}
                   </h4>
-                  <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
-                    <Calendar size={10} /> {tx.date}
+                  <span style={{ fontSize: '9px', color: 'var(--color-text-muted)', display: 'block', marginTop: '2.5px' }}>
+                    {tx.date}
                   </span>
                 </div>
               </div>
               
               <span style={{ 
-                fontSize: '13px', 
+                fontSize: '10px', 
+                color: COLORS[tx.category] || 'var(--color-gold)', 
+                fontWeight: '700',
+                backgroundColor: COLORS[tx.category] ? `${COLORS[tx.category]}15` : 'rgba(212, 175, 55, 0.08)',
+                padding: '2px 8px',
+                borderRadius: '10px',
+                border: `1px solid ${COLORS[tx.category] ? `${COLORS[tx.category]}30` : 'rgba(212, 175, 55, 0.15)'}`,
+                textAlign: 'center',
+                alignSelf: 'center',
+                justifySelf: 'center',
+                width: 'fit-content',
+                textTransform: 'capitalize'
+              }}>
+                {tx.category}
+              </span>
+              
+              <span style={{ 
+                fontSize: '12px', 
                 fontWeight: '700', 
-                color: data.anomalies.some(an => an.id === tx.id) ? 'var(--color-danger)' : 'white' 
+                color: data.anomalies.some(an => an.id === tx.id) ? 'var(--color-danger)' : 'white',
+                textAlign: 'right'
               }}>
                 {renderAmount(tx.amount)}
               </span>

@@ -200,19 +200,42 @@ async function createTables() {
     );
   `;
 
+  const chatSessionsTable = isSQLite ? `
+    CREATE TABLE IF NOT EXISTS chat_sessions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      title TEXT DEFAULT 'New Chat',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  ` : `
+    CREATE TABLE IF NOT EXISTS chat_sessions (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL,
+      title VARCHAR(255) DEFAULT 'New Chat',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `;
+
   const conversationsTable = isSQLite ? `
     CREATE TABLE IF NOT EXISTS conversations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL,
+      session_id INTEGER,
       sender TEXT NOT NULL,
       message TEXT NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY(session_id) REFERENCES chat_sessions(id) ON DELETE CASCADE
     );
   ` : `
     CREATE TABLE IF NOT EXISTS conversations (
       id SERIAL PRIMARY KEY,
       user_id INTEGER NOT NULL,
+      session_id INTEGER REFERENCES chat_sessions(id) ON DELETE CASCADE,
       sender VARCHAR(50) NOT NULL,
       message TEXT NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -227,14 +250,32 @@ async function createTables() {
       dbClient.run(transactionsTable);
       dbClient.run(portfoliosTable);
       dbClient.run(goalsTable);
+      dbClient.run(chatSessionsTable);
       dbClient.run(conversationsTable);
+
+      // Safe migration: add session_id if it doesn't exist
+      dbClient.all("PRAGMA table_info(conversations)", (err, rows) => {
+        if (!err && rows) {
+          const hasSessionId = rows.some(row => row.name === 'session_id');
+          if (!hasSessionId) {
+            dbClient.run("ALTER TABLE conversations ADD COLUMN session_id INTEGER REFERENCES chat_sessions(id) ON DELETE CASCADE");
+          }
+        }
+      });
     });
   } else {
     await dbClient.query(usersTable);
     await dbClient.query(transactionsTable);
     await dbClient.query(portfoliosTable);
     await dbClient.query(goalsTable);
+    await dbClient.query(chatSessionsTable);
     await dbClient.query(conversationsTable);
+
+    try {
+      await dbClient.query("ALTER TABLE conversations ADD COLUMN IF NOT EXISTS session_id INTEGER REFERENCES chat_sessions(id) ON DELETE CASCADE");
+    } catch (alterErr) {
+      console.warn("Postgres alter table warning:", alterErr.message);
+    }
   }
   console.log('Database tables verified/created successfully.');
 }

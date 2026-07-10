@@ -213,7 +213,7 @@ export default function Dashboard() {
       </div>
 
       {/* Recharts Portfolio Performance Line Chart */}
-      <div className="glass-card" style={{ padding: '16px' }}>
+      <div className="glass-card" style={{ padding: '24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
           <h3 style={{ fontSize: '14px', fontWeight: '700' }}>Portfolio Performance</h3>
           <div style={{ display: 'flex', gap: '6px', backgroundColor: 'var(--color-navy-dark)', padding: '2px', borderRadius: '6px' }}>
@@ -303,7 +303,7 @@ export default function Dashboard() {
       </div>
 
       {/* Quick Action Navigation */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+      <div className="quick-actions">
         <button 
           onClick={() => setActiveScreen('Chat')}
           className="glass-card" 
@@ -333,7 +333,7 @@ export default function Dashboard() {
       </div>
 
       {/* Spending Progress Overview */}
-      <div className="glass-card" style={{ padding: '16px' }}>
+      <div className="glass-card" style={{ padding: '24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
           <h3 style={{ fontSize: '14px', fontWeight: '700' }}>Spending Consumption</h3>
           <button 
@@ -370,7 +370,7 @@ export default function Dashboard() {
       </div>
 
       {/* Goal Progress Rings */}
-      <div className="glass-card" style={{ padding: '16px' }}>
+      <div className="glass-card" style={{ padding: '24px' }}>
         <h3 style={{ fontSize: '14px', fontWeight: '700', marginBottom: '14px' }}>Goal Progress</h3>
         
         <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', paddingBottom: '4px' }}>

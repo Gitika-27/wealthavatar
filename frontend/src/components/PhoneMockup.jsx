@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import { 
   Home, 
@@ -7,11 +7,7 @@ import {
   MessageSquare, 
   Target, 
   Settings, 
-  ShieldAlert, 
-  Wifi, 
-  Battery, 
-  Fingerprint, 
-  Unlock 
+  Fingerprint
 } from 'lucide-react';
 
 export default function PhoneMockup({ children }) {
@@ -23,29 +19,11 @@ export default function PhoneMockup({ children }) {
     setIsAppLocked, 
     isBiometricEnrolled,
     isBiometricAuthenticated, 
-    setIsBiometricAuthenticated,
-    user
+    setIsBiometricAuthenticated
   } = useContext(AppContext);
 
-  const [time, setTime] = useState('');
   const [bioScanning, setBioScanning] = useState(false);
   const [scanMessage, setScanMessage] = useState('Tap to simulate scan');
-
-  // Clock update
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      let hours = now.getHours();
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      hours = hours % 12;
-      hours = hours ? hours : 12; // 0 should be 12
-      setTime(`${hours}:${minutes} ${ampm}`);
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 60000);
-    return () => clearInterval(interval);
-  }, []);
 
   // Simulating the fingerprint scanning sequence
   const handleSimulateScan = () => {
@@ -66,27 +44,41 @@ export default function PhoneMockup({ children }) {
     setIsAppLocked(false);
   };
 
-  return (
-    <div className="phone-mockup">
-      {/* Notch */}
-      <div className="phone-notch"></div>
+  const navigationItems = [
+    { screen: 'Dashboard', label: 'Overview', Icon: Home },
+    { screen: 'Spending', label: 'Spending', Icon: PieChart },
+    { screen: 'Portfolio', label: 'Portfolio', Icon: Briefcase },
+    { screen: 'Chat', label: 'Cashius AI', Icon: MessageSquare },
+    { screen: 'Goals', label: 'Goals', Icon: Target },
+    { screen: 'Settings', label: 'Profile', Icon: Settings }
+  ];
 
-      {/* Status Bar */}
-      <div className="phone-status-bar">
-        <span>{time}</span>
-        <div className="status-right">
-          <Wifi size={14} />
-          <span>5G</span>
-          <Battery size={16} />
-          <span>98%</span>
-        </div>
-      </div>
+  const renderNavigation = (className) => (
+    <nav className={className} aria-label="Main navigation">
+      {navigationItems.map(({ screen, label, Icon }) => (
+        <button
+          key={screen}
+          type="button"
+          className={`nav-item ${activeScreen === screen ? 'active' : ''}`}
+          onClick={() => setActiveScreen(screen)}
+        >
+          <Icon size={20} />
+          <span>{label}</span>
+        </button>
+      ))}
+    </nav>
+  );
+
+  return (
+    <div className="app-layout">
+
+      {isAuthenticated && (!isAppLocked || isBiometricAuthenticated) && renderNavigation('app-sidebar')}
 
       {/* Biometric Lock Overlay */}
       {isAuthenticated && isAppLocked && !isBiometricAuthenticated && (
         <div style={{
-          position: 'absolute',
-          top: 44,
+          position: 'fixed',
+          top: 0,
           left: 0,
           right: 0,
           bottom: 0,
@@ -163,62 +155,12 @@ export default function PhoneMockup({ children }) {
       )}
 
       {/* Screen View */}
-      <div className="phone-screen">
+      <div className="app-screen">
         {children}
       </div>
 
-      {/* Navigation Footer */}
-      {isAuthenticated && (!isAppLocked || isBiometricAuthenticated) && (
-        <div className="phone-nav-bar">
-          <div 
-            className={`nav-item ${activeScreen === 'Dashboard' ? 'active' : ''}`}
-            onClick={() => setActiveScreen('Dashboard')}
-          >
-            <Home size={20} />
-            <span>Overview</span>
-          </div>
-
-          <div 
-            className={`nav-item ${activeScreen === 'Spending' ? 'active' : ''}`}
-            onClick={() => setActiveScreen('Spending')}
-          >
-            <PieChart size={20} />
-            <span>Spending</span>
-          </div>
-
-          <div 
-            className={`nav-item ${activeScreen === 'Portfolio' ? 'active' : ''}`}
-            onClick={() => setActiveScreen('Portfolio')}
-          >
-            <Briefcase size={20} />
-            <span>Portfolio</span>
-          </div>
-
-          <div 
-            className={`nav-item ${activeScreen === 'Chat' ? 'active' : ''}`}
-            onClick={() => setActiveScreen('Chat')}
-          >
-            <MessageSquare size={20} />
-            <span>Cashius AI</span>
-          </div>
-
-          <div 
-            className={`nav-item ${activeScreen === 'Goals' ? 'active' : ''}`}
-            onClick={() => setActiveScreen('Goals')}
-          >
-            <Target size={20} />
-            <span>Goals</span>
-          </div>
-
-          <div 
-            className={`nav-item ${activeScreen === 'Settings' ? 'active' : ''}`}
-            onClick={() => setActiveScreen('Settings')}
-          >
-            <Settings size={20} />
-            <span>Profile</span>
-          </div>
-        </div>
-      )}
+      {/* Mobile navigation */}
+      {isAuthenticated && (!isAppLocked || isBiometricAuthenticated) && renderNavigation('app-nav-bar')}
     </div>
   );
 }

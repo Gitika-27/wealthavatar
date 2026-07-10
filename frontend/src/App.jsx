@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { AppContext } from './context/AppContext';
 import PhoneMockup from './components/PhoneMockup';
 
@@ -46,16 +46,15 @@ export default function App() {
   };
 
   return (
-    <div className="app-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div className="app-container">
       
       {/* Dynamic Market Insights Quick Banner */}
       {isAuthenticated && activeScreen !== 'Onboarding' && activeScreen !== 'Market' && (
         <div 
           onClick={() => setActiveScreen('Market')}
-          className="glass-card animate-float"
+          className="market-insights-banner glass-card animate-float"
           style={{
             marginBottom: '16px',
-            width: '410px',
             padding: '10px 14px',
             borderRadius: '12px',
             fontSize: '11px',
@@ -77,21 +76,10 @@ export default function App() {
         </div>
       )}
 
-      {/* Main phone body */}
+      {/* Main application content */}
       <PhoneMockup>
         {renderScreen()}
       </PhoneMockup>
-
-      {/* Under frame details */}
-      <div style={{
-        marginTop: '12px',
-        fontSize: '11px',
-        color: '#64748B',
-        textAlign: 'center',
-        fontFamily: 'var(--font-body)'
-      }}>
-        WealthAvatar Mobile Module Simulator v1.0.0
-      </div>
 
     </div>
   );
